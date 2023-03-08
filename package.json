@@ -1,0 +1,10 @@
+{
+  "name": "com.em.assistant",
+  "displayName": "EM.Assistant",
+  "version": "0.0.1",
+  "author": {
+    "name": "Maxim Epishev",
+    "email": "epishev.m@mail.ru"
+  },
+  "type": "library"
+}

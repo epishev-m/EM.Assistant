@@ -1,0 +1,14 @@
+{
+    "name": "EM.Assistant",
+    "rootNamespace": "",
+    "references": ["GUID:94c2e9f1badce174dbc436ca38ab847c","GUID:b990daed68c33b24f971e617e2eb1443","GUID:efb3d83b3a99830488e653f1fe5dfa8b"],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
