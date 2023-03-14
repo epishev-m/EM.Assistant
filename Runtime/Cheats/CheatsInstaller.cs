@@ -15,6 +15,11 @@ public sealed class CheatsInstaller : IInstaller
 			.To<CheatBinder>()
 			.ToSingleton();
 
+		diContainer.Bind<CheatsModel>()
+			.InGlobal()
+			.To<CheatsModel>()
+			.ToSingleton();
+
 		diContainer.Bind<Cheats>()
 			.InGlobal()
 			.To<Cheats>()
@@ -24,6 +29,15 @@ public sealed class CheatsInstaller : IInstaller
 			.InGlobal()
 			.To<CheatTest>()
 			.ToSingleton();
+
+		diContainer.Bind<CheatsRouter>()
+			.InGlobal()
+			.To<CheatsRouter>()
+			.ToSingleton();
+
+		diContainer.Bind<CheatsViewModel>()
+			.InLocal()
+			.To<CheatsViewModel>();
 
 		diContainer.Resolve<Cheats>()
 			.Add<CheatTest>();

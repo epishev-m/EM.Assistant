@@ -210,10 +210,10 @@ public sealed class DocumentationWindow : EditorWindow
 			using (new EditorScrollView(ref _groupsScrollPos))
 			{
 				var buttonStyle = new GUIStyle(GUI.skin.button);
-				var filter = ToSnakeCase(_groupsFilter);
+				var filter = _groupsFilter.ToLower();
 
 				foreach (var key in _groups.Where(group =>
-					         !string.IsNullOrWhiteSpace(group) && ToSnakeCase(group).Contains(filter)))
+							!string.IsNullOrWhiteSpace(group) && group.ToLower().Contains(filter)))
 				{
 					var temp = _groupsState[key];
 					_groupsState[key] = GUILayout.Toggle(_groupsState[key], key, buttonStyle);
@@ -306,9 +306,9 @@ public sealed class DocumentationWindow : EditorWindow
 		{
 			using (new EditorScrollView(ref _typesScrollPos))
 			{
-				var filter = ToSnakeCase(_typesFilter);
+				var filter = _typesFilter.ToLower();
 
-				foreach (var typeComponent in _typesBoxes.Where(docType => ToSnakeCase(docType.Name).Contains(filter)))
+				foreach (var typeComponent in _typesBoxes.Where(docType => docType.Name.ToLower().Contains(filter)))
 				{
 					var groups = typeComponent.Groups;
 
@@ -324,11 +324,6 @@ public sealed class DocumentationWindow : EditorWindow
 	}
 
 	#endregion
-
-	private static string ToSnakeCase(string s)
-	{
-		return Regex.Replace(s, "[A-Z]", "_$0").ToLower();
-	}
 
 	private GUILayoutOption GetGuiLayoutRightWidth()
 	{

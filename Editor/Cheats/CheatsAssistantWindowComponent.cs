@@ -23,13 +23,13 @@ public sealed class CheatsAssistantWindowComponent : IAssistantWindowComponent
 	{
 		if (!Application.isPlaying)
 		{
-			Cheats.Instance = null;
+			Cheats.CheatsModel = null;
 			EditorGUILayout.HelpBox("Cheats are only available in playmode!", MessageType.Info);
 
 			return;
 		}
 
-		if (Cheats.Instance == null)
+		if (Cheats.CheatsModel == null)
 		{
 			EditorGUILayout.HelpBox("cheats are not created!", MessageType.Info);
 
@@ -43,13 +43,12 @@ public sealed class CheatsAssistantWindowComponent : IAssistantWindowComponent
 			EditorGUILayout.Space();
 			EditorGUILayout.Space();
 
-			var names = Cheats.Instance.GetNames();
+			var names = Cheats.CheatsModel.GetNames();
 
 			foreach (var name in names)
 			{
-				var info = Cheats.Instance.GetInfoByName(name);
-				var items = Cheats.Instance.GetItemsByName(name);
-				OnGuiCheat(name, info, items);
+				var items = Cheats.CheatsModel.GetFieldsByName(name);
+				OnGuiCheat(name, items);
 			}
 		}
 	}
@@ -58,16 +57,11 @@ public sealed class CheatsAssistantWindowComponent : IAssistantWindowComponent
 
 	#region CheatsAssistantWindowComponent
 
-	private void OnGuiCheat(string cheatName, string info, IEnumerable<ICheatItem> items)
+	private void OnGuiCheat(string cheatName, IEnumerable<ICheatFieldModel> items)
 	{
 		using (new EditorVerticalGroup())
 		{
 			EditorGUILayout.LabelField(cheatName, EditorStyles.boldLabel);
-
-			if (_info)
-			{
-				EditorGUILayout.HelpBox(info, MessageType.Info);
-			}
 
 			foreach (var item in items)
 			{
@@ -76,132 +70,228 @@ public sealed class CheatsAssistantWindowComponent : IAssistantWindowComponent
 		}
 	}
 
-	private static void OnGuiItem(ICheatItem item)
+	private void OnGuiItem(ICheatFieldModel fieldModel)
 	{
-		switch (item)
+		switch (fieldModel)
 		{
-			case CheatIntField field:
+			case InfoCheatFieldModel field:
+				OnGuiInfoField(field);
+				break;
+			case IntCheatFieldModel field:
 				OnGuiIntField(field);
 				break;
-			case CheatFloatField field:
+			case FloatCheatFieldModel field:
 				OnGuiFloatField(field);
 				break;
-			case CheatLongField field:
+			case LongCheatFieldModel field:
 				OnGuiLongField(field);
 				break;
-			case CheatDoubleField field:
+			case DoubleCheatFieldModel field:
 				OnGuiDoubleField(field);
 				break;
-			case CheatVector2Field field:
+			case Vector2CheatFieldModel field:
 				OnGuiVector2Field(field);
 				break;
-			case CheatVector3Field field:
+			case Vector3CheatFieldModel field:
 				OnGuiVector3Field(field);
 				break;
-			case CheatVector4Field field:
+			case Vector4CheatFieldModel field:
 				OnGuiVector4Field(field);
 				break;
-			case CheatSliderField field:
+			case SliderCheatFieldModel field:
 				OnGuiSliderField(field);
 				break;
-			case CheatIntSliderField field:
+			case IntSliderCheatFieldModel field:
 				OnGuiIntSliderField(field);
 				break;
-			case CheatMinMaxSliderField field:
+			case MinMaxSliderCheatFieldModel field:
 				OnGuiMinMaxSliderField(field);
 				break;
-			case CheatRectField field:
+			case IntMinMaxSliderCheatFieldModel field:
+				OnGuiIntMinMaxSliderField(field);
+				break;
+			case RectCheatFieldModel field:
 				OnGuiRectField(field);
 				break;
-			case CheatTextField field:
+			case TextCheatFieldModel field:
 				OnGuiTextField(field);
 				break;
-			case CheatButton button:
+			case ButtonCheatFieldModel button:
 				OnGuiButton(button);
+				break;
+			case Button2CheatFieldModel button:
+				OnGuiButton2(button);
+				break;
+			case Button3CheatFieldModel button:
+				OnGuiButton3(button);
 				break;
 			default:
 				throw new InvalidOperationException();
 		}
 	}
 
-	private static void OnGuiIntField(CheatIntField field)
+	private void OnGuiInfoField(InfoCheatFieldModel fieldModel)
 	{
-		field.Value = EditorGUILayout.IntField(field.Label, field.Value);
+		if (_info)
+		{
+			EditorGUILayout.HelpBox(fieldModel.Info, MessageType.Info);
+		}
 	}
 
-	private static void OnGuiFloatField(CheatFloatField field)
+	private static void OnGuiIntField(IntCheatFieldModel fieldModel)
+	{
+		fieldModel.Value = EditorGUILayout.IntField(fieldModel.Label, fieldModel.Value);
+	}
+
+	private static void OnGuiFloatField(FloatCheatFieldModel field)
 	{
 		field.Value = EditorGUILayout.FloatField(field.Label, field.Value);
 	}
 
-	private static void OnGuiLongField(CheatLongField field)
+	private static void OnGuiLongField(LongCheatFieldModel fieldModel)
 	{
-		field.Value = EditorGUILayout.LongField(field.Label, field.Value);
+		fieldModel.Value = EditorGUILayout.LongField(fieldModel.Label, fieldModel.Value);
 	}
 
-	private static void OnGuiDoubleField(CheatDoubleField field)
+	private static void OnGuiDoubleField(DoubleCheatFieldModel fieldModel)
 	{
-		field.Value = EditorGUILayout.DoubleField(field.Label, field.Value);
+		fieldModel.Value = EditorGUILayout.DoubleField(fieldModel.Label, fieldModel.Value);
 	}
 
-	private static void OnGuiVector2Field(CheatVector2Field field)
+	private static void OnGuiVector2Field(Vector2CheatFieldModel fieldModel)
 	{
-		field.Value = EditorGUILayout.Vector2Field(field.Label, field.Value);
+		fieldModel.Value = EditorGUILayout.Vector2Field(fieldModel.Label, fieldModel.Value);
 	}
 
-	private static void OnGuiVector3Field(CheatVector3Field field)
+	private static void OnGuiVector3Field(Vector3CheatFieldModel field)
 	{
 		field.Value = EditorGUILayout.Vector3Field(field.Label, field.Value);
 	}
 
-	private static void OnGuiVector4Field(CheatVector4Field field)
+	private static void OnGuiVector4Field(Vector4CheatFieldModel field)
 	{
 		field.Value = EditorGUILayout.Vector4Field(field.Label, field.Value);
 	}
 
-	private static void OnGuiSliderField(CheatSliderField field)
+	private static void OnGuiSliderField(SliderCheatFieldModel fieldModel)
 	{
-		field.Value = EditorGUILayout.Slider(field.Label, field.Value, field.LeftValue, field.RightValue);
+		fieldModel.Value = EditorGUILayout.Slider(fieldModel.Label, fieldModel.Value, fieldModel.MinValue, fieldModel.MaxValue);
 	}
 
-	private static void OnGuiIntSliderField(CheatIntSliderField field)
+	private static void OnGuiIntSliderField(IntSliderCheatFieldModel fieldModel)
 	{
-		field.Value = EditorGUILayout.IntSlider(field.Label, field.Value, field.LeftValue, field.RightValue);
+		fieldModel.Value = EditorGUILayout.IntSlider(fieldModel.Label, fieldModel.Value, fieldModel.MinLimit, fieldModel.MaxLimit);
 	}
 
-	private static void OnGuiMinMaxSliderField(CheatMinMaxSliderField field)
+	private static void OnGuiMinMaxSliderField(MinMaxSliderCheatFieldModel fieldModel)
 	{
 		using (new EditorVerticalGroup())
 		{
-			EditorGUILayout.MinMaxSlider(field.Label, ref field.MinValue, ref field.MaxValue, field.MinLimit, field.MaxLimit);
+			var minValue = fieldModel.MinValue;
+			var maxValue = fieldModel.MaxValue;
+			EditorGUILayout.MinMaxSlider(fieldModel.Label, ref minValue, ref maxValue, fieldModel.MinLimit, fieldModel.MaxLimit);
+			fieldModel.MinValue = minValue;
+			fieldModel.MaxValue = maxValue;
 
 			using (new EditorHorizontalGroup())
 			{
-				field.MinValue = EditorGUILayout.FloatField("Min Value:", field.MinValue);
-				field.MaxValue = EditorGUILayout.FloatField("Max Value:", field.MaxValue);
+				fieldModel.MinValue = EditorGUILayout.FloatField("Min Value:", fieldModel.MinValue);
+				fieldModel.MaxValue = EditorGUILayout.FloatField("Max Value:", fieldModel.MaxValue);
 			}
 		}
 	}
 
-	private static void OnGuiRectField(CheatRectField field)
+	private static void OnGuiIntMinMaxSliderField(IntMinMaxSliderCheatFieldModel model)
+	{
+		using (new EditorVerticalGroup())
+		{
+			var minValue = (float) model.MinValue;
+			var maxValue = (float) model.MaxValue;
+			EditorGUILayout.MinMaxSlider(model.Label, ref minValue, ref maxValue, model.MinLimit, model.MaxLimit);
+
+			if (maxValue - minValue < model.MinDistance)
+			{
+				if (minValue + model.MinDistance <= model.MaxLimit)
+				{
+					maxValue = minValue + model.MinDistance;
+				}
+				else
+				{
+					minValue = maxValue - model.MinDistance;
+				}
+			}
+
+			model.MinValue = (int) minValue;
+			model.MaxValue = (int) maxValue;
+
+			using (new EditorHorizontalGroup())
+			{
+				model.MinValue = EditorGUILayout.IntField("Min Value:", model.MinValue);
+				model.MaxValue = EditorGUILayout.IntField("Max Value:", model.MaxValue);
+			}
+		}
+	}
+
+	private static void OnGuiRectField(RectCheatFieldModel field)
 	{
 		field.Value = EditorGUILayout.RectField(field.Label, field.Value);
 	}
 
-	private static void OnGuiTextField(CheatTextField field)
+	private static void OnGuiTextField(TextCheatFieldModel field)
 	{
 		field.Value = EditorGUILayout.TextField(field.Label, field.Value);
 	}
 
-	private static void OnGuiButton(CheatButton button)
+	private static void OnGuiButton(ButtonCheatFieldModel fieldModel)
 	{
 		using (new EditorHorizontalGroup())
 		{
 			GUILayout.Space(17);
 
-			if (GUILayout.Button(button.Label))
+			if (GUILayout.Button(fieldModel.Label))
 			{
-				button.Action?.Invoke();
+				fieldModel.Action?.Invoke();
+			}
+		}
+	}
+
+	private static void OnGuiButton2(Button2CheatFieldModel fieldModel)
+	{
+		using (new EditorHorizontalGroup())
+		{
+			GUILayout.Space(17);
+
+			if (GUILayout.Button(fieldModel.Label1))
+			{
+				fieldModel.Action1?.Invoke();
+			}
+
+			if (GUILayout.Button(fieldModel.Label2))
+			{
+				fieldModel.Action2?.Invoke();
+			}
+		}
+	}
+
+	private static void OnGuiButton3(Button3CheatFieldModel fieldModel)
+	{
+		using (new EditorHorizontalGroup())
+		{
+			GUILayout.Space(17);
+
+			if (GUILayout.Button(fieldModel.Label1))
+			{
+				fieldModel.Action1?.Invoke();
+			}
+
+			if (GUILayout.Button(fieldModel.Label2))
+			{
+				fieldModel.Action2?.Invoke();
+			}
+
+			if (GUILayout.Button(fieldModel.Label3))
+			{
+				fieldModel.Action3?.Invoke();
 			}
 		}
 	}

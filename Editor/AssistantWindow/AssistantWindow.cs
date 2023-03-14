@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Foundation.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -92,7 +93,9 @@ public abstract class AssistantWindowBase : EditorWindow
 	{
 		using (new EditorScrollView(ref _scrollPos))
 		{
-			foreach (var component in _components.Where(component => component.Name.Contains(_filter)))
+			var filter = _filter.ToLower();
+
+			foreach (var component in _components.Where(component => component.Name.ToLower().Contains(filter)))
 			{
 				component.OnGUI();
 			}
