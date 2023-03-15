@@ -24,6 +24,7 @@ public sealed class CheatFieldViewFactory
 		ICheatFieldView cheatFieldView = viewModel switch
 		{
 			InfoFieldViewModel => Object.Instantiate(_prefabs.InfoCheatFieldViewPrefab, parent, true),
+			BoolFieldViewModel => Object.Instantiate(_prefabs.BoolCheatFieldViewPrefab, parent, true),
 			IntFieldViewModel => Object.Instantiate(_prefabs.IntCheatFieldView, parent, true),
 			LongFieldViewModel => Object.Instantiate(_prefabs.LongCheatFieldView, parent, true),
 			FloatFieldViewModel => Object.Instantiate(_prefabs.FloatCheatFieldView, parent, true),

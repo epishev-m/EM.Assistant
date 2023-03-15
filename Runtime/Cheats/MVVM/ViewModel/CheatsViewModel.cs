@@ -111,14 +111,7 @@ public sealed class CheatsViewModel : ICheatsViewModel
 
 	public void Close()
 	{
-		CloseOpen().Forget();
-	}
-
-	private async UniTask CloseOpen()
-	{
-		await _cheatsRouter.CloseAsync(new CancellationToken());
-		await UniTask.Delay(2000);
-		await _cheatsRouter.OpenAsync(new CancellationToken());
+		_cheatsRouter.CloseAsync(new CancellationToken()).Forget();
 	}
 
 	#endregion
@@ -152,6 +145,7 @@ public sealed class CheatsViewModel : ICheatsViewModel
 		IFieldViewModel viewModel = fieldModel switch
 		{
 			InfoCheatFieldModel model => new InfoFieldViewModel(model),
+			BoolCheatFieldModel model => new BoolFieldViewModel(model),
 			IntCheatFieldModel model => new IntFieldViewModel(model),
 			LongCheatFieldModel model => new LongFieldViewModel(model),
 			FloatCheatFieldModel model => new FloatFieldViewModel(model),

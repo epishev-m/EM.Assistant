@@ -5,6 +5,8 @@ using UnityEngine;
 
 public sealed class CheatTest : ICheat
 {
+	private readonly BoolCheatFieldModel _boolCheatFieldModel = new("Bool");
+
 	private readonly IntCheatFieldModel _intCheatFieldModel = new("Int");
 
 	private readonly LongCheatFieldModel _longCheatFieldModel = new("Long");
@@ -35,6 +37,13 @@ public sealed class CheatTest : ICheat
 
 	public void Registration(ICheatBinder cheatBinder)
 	{
+		cheatBinder.Bind("Cheat Bool")
+			.InGlobal()
+			.SetGroups("base", "Bool")
+			.AddInfo("Demonstration Bool!")
+			.AddField(_boolCheatFieldModel)
+			.AddButton("Log", () => Debug.Log(_boolCheatFieldModel.Value));
+
 		cheatBinder.Bind("Cheat Int")
 			.InGlobal()
 			.SetGroups("base", "Int")

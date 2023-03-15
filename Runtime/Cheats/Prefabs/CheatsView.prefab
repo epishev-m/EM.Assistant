@@ -356,6 +356,7 @@ MonoBehaviour:
   _cheatModuleViewPrefab: {fileID: 265095112290376842, guid: 325b062687f5c014d8cd308e971fb81f, type: 3}
   _cheatFieldViewPrefabs:
     _infoCheatFieldViewPrefab: {fileID: -5271216599113478333, guid: 113813a73b742af4a818c10bb20a8b6e, type: 3}
+    _boolCheatFieldViewPrefab: {fileID: 6880090627689005518, guid: 6f91efd05782d304f9aa511a98005046, type: 3}
     _intCheatFieldView: {fileID: 8211797761846934117, guid: 1e70a94a2e25bbf4bb05477c542ba1e1, type: 3}
     _longCheatFieldView: {fileID: -559046618013595661, guid: 3f57af0fefcf24240a0efbf80b16db2e, type: 3}
     _floatCheatFieldView: {fileID: 1745409158092128208, guid: d7ab5e70b1c452644873e8751997ebf0, type: 3}

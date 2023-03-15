@@ -11,6 +11,9 @@ public sealed class CheatFieldViewPrefabs
 	private InfoCheatFieldView _infoCheatFieldViewPrefab;
 
 	[SerializeField]
+	private BoolCheatFieldView _boolCheatFieldViewPrefab;
+
+	[SerializeField]
 	private IntCheatFieldView _intCheatFieldView;
 
 	[SerializeField]
@@ -61,6 +64,8 @@ public sealed class CheatFieldViewPrefabs
 	#region CheatFieldViewPrefabs
 
 	public InfoCheatFieldView InfoCheatFieldViewPrefab => _infoCheatFieldViewPrefab;
+
+	public BoolCheatFieldView BoolCheatFieldViewPrefab => _boolCheatFieldViewPrefab;
 
 	public IntCheatFieldView IntCheatFieldView => _intCheatFieldView;
 

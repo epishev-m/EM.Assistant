@@ -3,12 +3,21 @@ namespace EM.Assistant.Editor
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using Foundation.Editor;
 
 public sealed class CheatsAssistantWindowComponent : IAssistantWindowComponent
 {
+	private readonly Dictionary<string, bool> _groupsState = new();
+
+	private bool _showGroups = true;
+
+	private string _groupsFilter = string.Empty;
+
+	private string _cheatsFilter = string.Empty;
+
 	private bool _info;
 
 	#region IAssistantWindowComponent
@@ -38,24 +47,148 @@ public sealed class CheatsAssistantWindowComponent : IAssistantWindowComponent
 
 		using (new EditorVerticalGroup())
 		{
-			_info = EditorGUILayout.ToggleLeft("Info", _info);
+			OnGuiTopButtons();
 
-			EditorGUILayout.Space();
-			EditorGUILayout.Space();
-
-			var names = Cheats.CheatsModel.GetNames();
-
-			foreach (var name in names)
+			if (_showGroups)
 			{
-				var items = Cheats.CheatsModel.GetFieldsByName(name);
-				OnGuiCheat(name, items);
+				OnGuiTopPanelGroups();
+				OnGuiGroups();
 			}
+
+			OnGuiCheats();
 		}
 	}
 
 	#endregion
 
 	#region CheatsAssistantWindowComponent
+
+	private void OnGuiTopButtons()
+	{
+		var buttonStyle = new GUIStyle(GUI.skin.button);
+
+		using (new EditorHorizontalGroup())
+		{
+			GUILayout.Space(17);
+			_showGroups = GUILayout.Toggle(_showGroups, "Groups", buttonStyle);
+		}
+	}
+
+	private void OnGuiTopPanelGroups()
+	{
+		var groups = Cheats.CheatsModel.GetGroups().ToArray();
+
+		using (new EditorHorizontalGroup())
+		{
+			GUILayout.Space(17);
+
+			if (GUILayout.Button("Select All"))
+			{
+				foreach (var group in groups)
+				{
+					_groupsState[group] = true;
+				}
+			}
+
+			if (GUILayout.Button("Deselect All"))
+			{
+				foreach (var key in groups)
+				{
+					_groupsState[key] = false;
+				}
+			}
+		}
+
+		using (new EditorHorizontalGroup())
+		{
+			GUILayout.Space(17);
+			EditorLayoutUtility.ToolbarSearch(ref _groupsFilter);
+		}
+
+		EditorGUILayout.Space();
+		EditorGUILayout.Space();
+	}
+
+	private void OnGuiGroups()
+	{
+		var buttonStyle = new GUIStyle(GUI.skin.button);
+		var groups = Cheats.CheatsModel.GetGroups().ToArray();
+
+		if (!_groupsState.Any())
+		{
+			foreach (var group in groups)
+			{
+				_groupsState.Add(group, true);
+			}
+		}
+
+		var filter = _groupsFilter.ToLower();
+
+		foreach (var group in groups.Where(group => !string.IsNullOrWhiteSpace(group) && group.ToLower().Contains(filter)))
+		{
+			using (new EditorHorizontalGroup())
+			{
+				GUILayout.Space(17);
+				_groupsState[group] = GUILayout.Toggle(_groupsState[group], group, buttonStyle);
+			}
+		}
+
+		EditorGUILayout.Space();
+		EditorGUILayout.Space();
+	}
+
+	private void OnGuiCheats()
+	{
+		var buttonStyle = new GUIStyle(GUI.skin.button);
+		using (new EditorHorizontalGroup())
+		{
+			GUILayout.Space(17);
+			_info = GUILayout.Toggle(_info, "Info", buttonStyle);
+		}
+
+		using (new EditorHorizontalGroup())
+		{
+			GUILayout.Space(17);
+			EditorLayoutUtility.ToolbarSearch(ref _cheatsFilter);
+		}
+
+		EditorGUILayout.Space();
+		EditorGUILayout.Space();
+
+		var names = Cheats.CheatsModel.GetNames();
+		var filter = _cheatsFilter.ToLower();
+
+		foreach (var name in names.Where(cheat => !string.IsNullOrWhiteSpace(cheat) && cheat.ToLower().Contains(filter)))
+		{
+			if (!CheckGroups(name))
+			{
+				continue;
+			}
+
+			var items = Cheats.CheatsModel.GetFieldsByName(name);
+			OnGuiCheat(name, items);
+		}
+	}
+
+	private bool CheckGroups(string name)
+	{
+		var groups = Cheats.CheatsModel.GetGroupsByName(name);
+
+		foreach (var group in groups)
+		{
+			if (!_groupsState.ContainsKey(group))
+			{
+				continue;
+			}
+
+			if (_groupsState[group])
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	private void OnGuiCheat(string cheatName, IEnumerable<ICheatFieldModel> items)
 	{
@@ -65,17 +198,22 @@ public sealed class CheatsAssistantWindowComponent : IAssistantWindowComponent
 
 			foreach (var item in items)
 			{
-				OnGuiItem(item);
+				OnGuiFields(item);
 			}
 		}
 	}
 
-	private void OnGuiItem(ICheatFieldModel fieldModel)
+	#region OnGuiFields
+
+	private void OnGuiFields(ICheatFieldModel fieldModel)
 	{
 		switch (fieldModel)
 		{
 			case InfoCheatFieldModel field:
 				OnGuiInfoField(field);
+				break;
+			case BoolCheatFieldModel field:
+				OnGuiBoolField(field);
 				break;
 			case IntCheatFieldModel field:
 				OnGuiIntField(field);
@@ -136,6 +274,11 @@ public sealed class CheatsAssistantWindowComponent : IAssistantWindowComponent
 		{
 			EditorGUILayout.HelpBox(fieldModel.Info, MessageType.Info);
 		}
+	}
+
+	private static void OnGuiBoolField(BoolCheatFieldModel fieldModel)
+	{
+		fieldModel.Value = EditorGUILayout.Toggle(fieldModel.Label, fieldModel.Value);
 	}
 
 	private static void OnGuiIntField(IntCheatFieldModel fieldModel)
@@ -295,6 +438,8 @@ public sealed class CheatsAssistantWindowComponent : IAssistantWindowComponent
 			}
 		}
 	}
+
+	#endregion
 
 	#endregion
 }
