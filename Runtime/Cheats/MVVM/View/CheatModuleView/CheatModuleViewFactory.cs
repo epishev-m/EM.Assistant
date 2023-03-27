@@ -15,6 +15,7 @@ public sealed class CheatModuleViewFactory : IFactory<CheatModuleView>
 	public Result<CheatModuleView> Create()
 	{
 		var cheatView = Object.Instantiate(_cheatModuleViewPrefab, _parent, true);
+		cheatView.transform.localScale = Vector3.one;
 
 		return new SuccessResult<CheatModuleView>(cheatView);
 	}

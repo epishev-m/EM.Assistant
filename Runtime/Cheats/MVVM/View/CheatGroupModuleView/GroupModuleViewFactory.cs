@@ -15,6 +15,7 @@ public sealed class GroupModuleViewFactory : IFactory<GroupModuleView>
 	public Result<GroupModuleView> Create()
 	{
 		var groupView = Object.Instantiate(_groupModuleViewPrefab, _parent, true);
+		groupView.transform.localScale = Vector3.one;
 
 		return new SuccessResult<GroupModuleView>(groupView);
 	}
