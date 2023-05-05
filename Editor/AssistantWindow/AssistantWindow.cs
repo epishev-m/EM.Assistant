@@ -3,14 +3,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Foundation.Editor;
 using UnityEditor;
 using UnityEngine;
 
 public abstract class AssistantWindowBase : EditorWindow
 {
-	private readonly List<AssistantWindowComponentGroupBox> _components = new();
+	private readonly List<AssistantComponentGroupBox> _components = new();
 
 	private Vector2 _scrollPos;
 
@@ -24,14 +22,8 @@ public abstract class AssistantWindowBase : EditorWindow
 
 		foreach (var component in _components)
 		{
-			component.Prepare();
-			component.AddListener(Repaint);
+			component.Prepare(this);
 		}
-	}
-
-	private void OnDisable()
-	{
-		_components.ForEach(c => c.RemoveListener(Repaint));
 	}
 
 	private void OnGUI()
@@ -44,17 +36,16 @@ public abstract class AssistantWindowBase : EditorWindow
 
 	#region AssistantWindowBase
 
-	protected abstract IEnumerable<IAssistantWindowComponent> GetWindowComponents();
+	protected abstract IEnumerable<IAssistantComponent> GetWindowComponents();
 
 	private void CreateComponents()
 	{
-		_components.ForEach(c => c.RemoveListener(Repaint));
 		_components.Clear();
-		var newComponents = GetWindowComponents();
+		var components = GetWindowComponents();
 
-		foreach (var component in newComponents)
+		foreach (var component in components)
 		{
-			_components.Add(new AssistantWindowComponentGroupBox(component));
+			_components.Add(new AssistantComponentGroupBox(component));
 		}
 	}
 

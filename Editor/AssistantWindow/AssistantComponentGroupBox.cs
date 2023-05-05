@@ -2,14 +2,12 @@
 {
 
 using Foundation;
-using Foundation.Editor;
 using UnityEditor;
 using UnityEditor.AnimatedValues;
-using UnityEngine.Events;
 
-public sealed class AssistantWindowComponentGroupBox : IAssistantWindowComponent
+public sealed class AssistantComponentGroupBox : IAssistantComponent
 {
-	private readonly IAssistantWindowComponent _component;
+	private readonly IAssistantComponent _component;
 
 	private readonly AnimBool _showExtraFields = new(false);
 
@@ -17,7 +15,11 @@ public sealed class AssistantWindowComponentGroupBox : IAssistantWindowComponent
 
 	public string Name => _component.Name;
 
-	public void Prepare() => _component.Prepare();
+	public void Prepare(EditorWindow window)
+	{
+		_showExtraFields.valueChanged.AddListener(window.Repaint);
+		_component.Prepare(window);
+	}
 
 	public void OnGUI()
 	{
@@ -41,21 +43,11 @@ public sealed class AssistantWindowComponentGroupBox : IAssistantWindowComponent
 
 	#region AssistantWindowComponentGroupBox
 
-	public AssistantWindowComponentGroupBox(IAssistantWindowComponent component)
+	public AssistantComponentGroupBox(IAssistantComponent component)
 	{
 		Requires.NotNullParam(component, nameof(component));
 
 		_component = component;
-	}
-
-	public void AddListener(UnityAction call)
-	{
-		_showExtraFields.valueChanged.AddListener(call);
-	}
-
-	public void RemoveListener(UnityAction call)
-	{
-		_showExtraFields.valueChanged.RemoveListener(call);
 	}
 
 	public void Show()

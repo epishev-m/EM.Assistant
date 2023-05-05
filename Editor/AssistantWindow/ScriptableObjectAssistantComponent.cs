@@ -1,12 +1,11 @@
 ﻿namespace EM.Assistant.Editor
 {
 
-using Foundation.Editor;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEngine;
 
-public abstract class ScriptableObjectAssistantWindowComponent<T> : IAssistantWindowComponent
+public abstract class ScriptableObjectAssistantComponent<T> : IAssistantComponent
 	where T : ScriptableObject
 {
 	protected string ConfigPath;
@@ -20,7 +19,7 @@ public abstract class ScriptableObjectAssistantWindowComponent<T> : IAssistantWi
 		get;
 	}
 
-	public void Prepare()
+	public void Prepare(EditorWindow _)
 	{
 		ConfigPath = EditorPrefs.GetString(ConfigPathKey);
 
@@ -86,7 +85,7 @@ public abstract class ScriptableObjectAssistantWindowComponent<T> : IAssistantWi
 		Settings = ScriptableObject.CreateInstance<T>();
 		AssetDatabase.CreateAsset(Settings, path);
 		AssetDatabase.SaveAssets();
-		UnityEditor.EditorUtility.FocusProjectWindow();
+		EditorUtility.FocusProjectWindow();
 		Selection.activeObject = Settings;
 	}
 

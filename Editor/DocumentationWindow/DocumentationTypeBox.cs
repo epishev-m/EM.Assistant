@@ -3,7 +3,6 @@ namespace EM.Assistant.Editor
 
 using System.Collections.Generic;
 using System.Linq;
-using Foundation.Editor;
 using UnityEditor;
 using UnityEditor.AnimatedValues;
 using UnityEngine;
