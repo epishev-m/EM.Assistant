@@ -1,7 +1,6 @@
 ﻿namespace EM.Assistant.Editor
 {
 
-using Foundation;
 using UnityEditor;
 using UnityEditor.AnimatedValues;
 
@@ -45,8 +44,6 @@ public sealed class AssistantComponentGroupBox : IAssistantComponent
 
 	public AssistantComponentGroupBox(IAssistantComponent component)
 	{
-		Requires.NotNullParam(component, nameof(component));
-
 		_component = component;
 	}
 
