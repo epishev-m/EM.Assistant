@@ -1,4 +1,4 @@
-﻿namespace EM.Assistant.Editor
+﻿namespace EM.Assistant.Editor.Legacy
 {
 
 using System;

@@ -1,51 +1,42 @@
-﻿namespace EM.Assistant.Editor
+﻿using UnityEditor;
+using UnityEditor.AddressableAssets;
+using UnityEditor.UIElements;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+namespace EM.Assistant.Editor
 {
 
-using UnityEditor;
-using UnityEditor.AddressableAssets;
-using UnityEngine;
-
-public abstract class ScriptableObjectAssistantComponent<T> : IAssistantComponent
+public abstract class ScriptableObjectAssistantComponent<T> : AssistantComponent
 	where T : ScriptableObject
 {
 	protected string ConfigPath;
 
-	protected T Settings;
+	protected T Config;
 
-	#region IAssistantWindowComponent
+	private VisualElement _buttonsPanel;
 
-	public abstract string Name
+	private ObjectField _objectField;
+
+	#region AssistantComponent
+
+	protected override void OnInitialized()
 	{
-		get;
+		base.OnInitialized();
+		CreateButtons();
+		LoadSettings();
+		EditorApplication.update += UpdatePath;
 	}
 
-	public void Prepare(EditorWindow _)
+	protected override void OnComposed()
 	{
-		ConfigPath = EditorPrefs.GetString(ConfigPathKey);
-
-		if (!string.IsNullOrWhiteSpace(ConfigPath))
-		{
-			Settings = AssetDatabase.LoadAssetAtPath(ConfigPath, typeof(T)) as T;
-		}
-	}
-
-	public void OnGUI()
-	{
-		if (Settings == null)
-		{
-			OnGUIButtons();
-		}
-		else
-		{
-			CheckPath();
-			OnGUIConfigField();
-			OnGUIConfig();
-		}
+		base.OnComposed();
+		Root.AddChild(_buttonsPanel);
 	}
 
 	#endregion
 
-	#region AssistantWindowComponentRealms
+	#region ScriptableObjectAssistantComponent
 
 	private string ConfigPathKey => $"AssistantWindow.{Name}.{nameof(ConfigPath)}";
 
@@ -53,40 +44,45 @@ public abstract class ScriptableObjectAssistantComponent<T> : IAssistantComponen
 
 	protected abstract string GetSelectPath();
 
-	protected abstract void OnGUIConfig();
-
-	private void OnGUIButtons()
+	protected virtual void SetConfig(T config)
 	{
-		using (new EditorHorizontalGroup())
-		{
-			if (GUILayout.Button("Create"))
-			{
-				CreateConfig();
-				SetAddressableFlag();
-			}
-
-			if (GUILayout.Button("Select"))
-			{
-				SelectConfig();
-				SetAddressableFlag();
-			}
-		}
+		Config = config;
+		_objectField.value = Config;
 	}
 
-	private void CreateConfig()
+	private void CreateButtons()
 	{
-		var path = GetCreatePath();
+		_objectField = new ObjectField()
+			.SetStyleFlexBasisPercent(72)
+			.SetEnable(false);
 
-		if (string.IsNullOrWhiteSpace(path))
-		{
-			return;
-		}
+		var buttonSelect = new Button(OnSelectButtonClicked)
+			.SetStyleFlexBasisPercent(14)
+			.SetText("Select");
 
-		Settings = ScriptableObject.CreateInstance<T>();
-		AssetDatabase.CreateAsset(Settings, path);
-		AssetDatabase.SaveAssets();
-		EditorUtility.FocusProjectWindow();
-		Selection.activeObject = Settings;
+		var buttonCreate = new Button(OnCreateButtonClicked)
+			.SetStyleFlexBasisPercent(14)
+			.SetText("Create");
+
+		_buttonsPanel = new VisualElement()
+			.SetStyleFlexDirection(FlexDirection.Row)
+			.SetStyleJustifyContent(Justify.SpaceAround)
+			.SetStyleMargin(10, 0, 0, 0)
+			.AddChild(buttonSelect)
+			.AddChild(buttonCreate)
+			.AddChild(_objectField);
+	}
+
+	private void OnSelectButtonClicked()
+	{
+		SelectConfig();
+		SetAddressableFlag();
+	}
+
+	private void OnCreateButtonClicked()
+	{
+		CreateConfig();
+		SetAddressableFlag();
 	}
 
 	private void SelectConfig()
@@ -99,26 +95,57 @@ public abstract class ScriptableObjectAssistantComponent<T> : IAssistantComponen
 		}
 
 		path = "Assets" + path.Remove(0, Application.dataPath.Length);
-		Settings = AssetDatabase.LoadAssetAtPath<T>(path);
+		var config = AssetDatabase.LoadAssetAtPath<T>(path);
+		SetConfig(config);
 	}
 
-	private void SetAddressableFlag()
+	private void CreateConfig()
 	{
-		var path = AssetDatabase.GetAssetPath(Settings);
-		var guiID = AssetDatabase.AssetPathToGUID(path);
-		var settings = AddressableAssetSettingsDefaultObject.Settings;
-		var assetEntry = settings.CreateOrMoveEntry(guiID, settings.DefaultGroup);
-		assetEntry.address = Settings.name;
-	}
+		var path = GetCreatePath();
 
-	private void CheckPath()
-	{
-		if (Settings == null)
+		if (string.IsNullOrWhiteSpace(path))
 		{
 			return;
 		}
 
-		var path = AssetDatabase.GetAssetPath(Settings);
+		var config = ScriptableObject.CreateInstance<T>();
+		AssetDatabase.CreateAsset(config, path);
+		AssetDatabase.SaveAssets();
+		EditorUtility.FocusProjectWindow();
+		Selection.activeObject = config;
+		SetConfig(config);
+	}
+
+	private void SetAddressableFlag()
+	{
+		var path = AssetDatabase.GetAssetPath(Config);
+		var guiID = AssetDatabase.AssetPathToGUID(path);
+		var settings = AddressableAssetSettingsDefaultObject.Settings;
+		var assetEntry = settings.CreateOrMoveEntry(guiID, settings.DefaultGroup);
+		assetEntry.address = Config.name;
+	}
+
+	private void LoadSettings()
+	{
+		ConfigPath = EditorPrefs.GetString(ConfigPathKey);
+
+		if (string.IsNullOrWhiteSpace(ConfigPath))
+		{
+			return;
+		}
+
+		Config = AssetDatabase.LoadAssetAtPath(ConfigPath, typeof(T)) as T;
+		_objectField.value = Config;
+	}
+
+	private void UpdatePath()
+	{
+		if (Config == null)
+		{
+			return;
+		}
+
+		var path = AssetDatabase.GetAssetPath(Config);
 
 		if (path == ConfigPath)
 		{
@@ -127,14 +154,6 @@ public abstract class ScriptableObjectAssistantComponent<T> : IAssistantComponen
 
 		ConfigPath = path;
 		EditorPrefs.SetString(ConfigPathKey, path);
-	}
-
-	private void OnGUIConfigField()
-	{
-		GUI.enabled = false;
-		EditorGUILayout.ObjectField(Settings, typeof(T), false);
-		GUI.enabled = true;
-		EditorGUILayout.Space();
 	}
 
 	#endregion

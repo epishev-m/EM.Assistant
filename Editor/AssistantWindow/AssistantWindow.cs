@@ -1,95 +1,124 @@
-﻿namespace EM.Assistant.Editor
-{
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEngine;
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
-public abstract class AssistantWindowBase : EditorWindow
+namespace EM.Assistant.Editor
 {
-	private readonly List<AssistantComponentGroupBox> _components = new();
 
-	private Vector2 _scrollPos;
+public abstract class AssistantWindow : EditorWindow
+{
+	private readonly List<AssistantComponent> _components = new();
 
-	private string _filter = string.Empty;
+	private VisualElement _buttonsPanel;
+
+	private VisualElement _searchPanel;
+
+	private ScrollView _scrollView;
 
 	#region EditorWindow
 
-	private void OnEnable()
+	private void CreateGUI()
 	{
-		CreateComponents();
-
-		foreach (var component in _components)
-		{
-			component.Prepare(this);
-		}
-	}
-
-	private void OnGUI()
-	{
-		OnGuiTopPanel();
-		OnGuiComponents();
+		Initialize();
+		Compose();
 	}
 
 	#endregion
 
-	#region AssistantWindowBase
+	#region AssistantWindow
 
-	protected abstract IEnumerable<IAssistantComponent> GetWindowComponents();
+	protected abstract IEnumerable<AssistantComponent> GetWindowComponents();
+
+	private void Initialize()
+	{
+		CreateButtons();
+		CreateToolbarSearch();
+		CreateComponents();
+	}
+
+	private void Compose()
+	{
+		rootVisualElement.Add(new VisualElement()
+			.SetStylePadding(10)
+			.AddChild(_buttonsPanel)
+			.AddChild(_searchPanel)
+			.AddChild(_scrollView)
+		);
+	}
+
+	private void CreateButtons()
+	{
+		var buttonSelect = new Button(OnShowAllButtonClicked)
+			.SetText("Show All")
+			.SetStyleFlexBasisPercent(50);
+
+		var buttonCreate = new Button(OnHideAllButtonClicked)
+			.SetText("Hide All")
+			.SetStyleFlexBasisPercent(50);
+
+		_buttonsPanel = new VisualElement()
+			.SetStyleFlexDirection(FlexDirection.Row)
+			.SetStyleJustifyContent(Justify.SpaceAround)
+			.SetStyleMinHeight(22)
+			.AddChild(buttonSelect)
+			.AddChild(buttonCreate);
+	}
+
+	private void CreateToolbarSearch()
+	{
+		var toolbarSearch = new ToolbarSearchField()
+			.SetStyleFlexBasisPercent(100)
+			.AddValueChangedCallback<ToolbarSearchField, string>(OnToolbarSearchValueChanged);
+
+		_searchPanel = new VisualElement()
+			.SetStyleFlexDirection(FlexDirection.Row)
+			.SetStyleJustifyContent(Justify.SpaceAround)
+			.SetStyleMinHeight(22)
+			.AddChild(toolbarSearch);
+	}
 
 	private void CreateComponents()
 	{
+		_scrollView = new ScrollView()
+			.SetStylePadding(5);
+
 		_components.Clear();
 		var components = GetWindowComponents();
 
 		foreach (var component in components)
 		{
-			_components.Add(new AssistantComponentGroupBox(component));
+			_scrollView.Add(component);
+			_components.Add(component);
 		}
 	}
 
-	private void OnGuiTopPanel()
+	private void OnShowAllButtonClicked()
 	{
-		using (new EditorVerticalGroup("GroupBox"))
-		{
-			OnGuiButtons();
-			EditorGUILayout.Space();
-			OnGuiSearch();
-		}
+		_components.ForEach(c => c.Show());
 	}
 
-	private void OnGuiButtons()
+	private void OnHideAllButtonClicked()
 	{
-		using (new EditorHorizontalGroup())
-		{
-			if (GUILayout.Button("Show All"))
-			{
-				_components.ForEach(c => c.Show());
-			}
+		_components.ForEach(c => c.Hide());
+	}
 
-			if (GUILayout.Button("Hide All"))
+	private void OnToolbarSearchValueChanged(string value)
+	{
+		var filter = value.ToLower();
+
+		foreach (var component in _components)
+		{
+			if (component.parent != null)
 			{
-				_components.ForEach(c => c.Hide());
+				_scrollView.Remove(component);
 			}
 		}
-	}
 
-	private void OnGuiSearch()
-	{
-		EditorLayoutUtility.ToolbarSearch(ref _filter);
-	}
-
-	private void OnGuiComponents()
-	{
-		using (new EditorScrollView(ref _scrollPos))
+		foreach (var component in _components.Where(component => component.Name.ToLower().Contains(filter)))
 		{
-			var filter = _filter.ToLower();
-
-			foreach (var component in _components.Where(component => component.Name.ToLower().Contains(filter)))
-			{
-				component.OnGUI();
-			}
+			_scrollView.Add(component);
 		}
 	}
 
