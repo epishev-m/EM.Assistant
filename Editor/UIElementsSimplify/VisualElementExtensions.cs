@@ -69,6 +69,18 @@ public static class VisualElementExtensions
 		return visualElement;
 	}
 
+	public static T RemoveChild<T>(this T visualElement,
+		VisualElement element)
+		where T : VisualElement
+	{
+		if (element.parent != null)
+		{
+			visualElement.Remove(element);
+		}
+
+		return visualElement;
+	}
+
 	public static T SetEnable<T>(this T visualElement,
 		bool value)
 		where T : VisualElement

@@ -11,6 +11,8 @@ public abstract class AssistantWindow : EditorWindow
 {
 	private readonly List<AssistantComponent> _components = new();
 
+	private ScrollView _root;
+
 	private VisualElement _buttonsPanel;
 
 	private VisualElement _searchPanel;
@@ -33,6 +35,7 @@ public abstract class AssistantWindow : EditorWindow
 
 	private void Initialize()
 	{
+		CreateRoot();
 		CreateButtons();
 		CreateToolbarSearch();
 		CreateComponents();
@@ -40,12 +43,17 @@ public abstract class AssistantWindow : EditorWindow
 
 	private void Compose()
 	{
-		rootVisualElement.Add(new VisualElement()
-			.SetStylePadding(10)
+		rootVisualElement.Add(_root
 			.AddChild(_buttonsPanel)
 			.AddChild(_searchPanel)
 			.AddChild(_scrollView)
 		);
+	}
+
+	private void CreateRoot()
+	{
+		_root = new ScrollView()
+			.SetStylePadding(10);
 	}
 
 	private void CreateButtons()
@@ -62,6 +70,7 @@ public abstract class AssistantWindow : EditorWindow
 			.SetStyleFlexDirection(FlexDirection.Row)
 			.SetStyleJustifyContent(Justify.SpaceAround)
 			.SetStyleMinHeight(22)
+			.SetStyleMargin(5)
 			.AddChild(buttonSelect)
 			.AddChild(buttonCreate);
 	}
@@ -76,6 +85,7 @@ public abstract class AssistantWindow : EditorWindow
 			.SetStyleFlexDirection(FlexDirection.Row)
 			.SetStyleJustifyContent(Justify.SpaceAround)
 			.SetStyleMinHeight(22)
+			.SetStyleMargin(0, 0, 5, 5)
 			.AddChild(toolbarSearch);
 	}
 
