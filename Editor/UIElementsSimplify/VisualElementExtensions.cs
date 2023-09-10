@@ -147,6 +147,15 @@ public static class VisualElementExtensions
 		return visualElement;
 	}
 
+	public static T SetStyleMinWidth<T>(this T visualElement,
+		float value)
+		where T : VisualElement
+	{
+		visualElement.style.minWidth = new StyleLength(value);
+
+		return visualElement;
+	}
+
 	public static T SetStyleFlexDirection<T>(this T visualElement,
 		FlexDirection value)
 		where T : VisualElement
