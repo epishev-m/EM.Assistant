@@ -53,24 +53,26 @@ public abstract class ScriptableObjectAssistantComponent<T> : AssistantComponent
 	private void CreateButtons()
 	{
 		_objectField = new ObjectField()
-			.SetStyleFlexBasisPercent(72)
+			.SetStyleFlexBasisPercent(75)
 			.SetEnable(false);
 
 		var buttonSelect = new Button(OnSelectButtonClicked)
-			.SetStyleFlexBasisPercent(14)
+			.SetStyleFlexBasisPercent(12.5f)
+			.SetStyleMargin(0, 0, 10, 0)
 			.SetText("Select");
 
 		var buttonCreate = new Button(OnCreateButtonClicked)
-			.SetStyleFlexBasisPercent(14)
+			.SetStyleFlexBasisPercent(12.5f)
+			.SetStyleMargin(0, 0, 10, 0)
 			.SetText("Create");
 
 		_buttonsPanel = new VisualElement()
 			.SetStyleFlexDirection(FlexDirection.Row)
 			.SetStyleJustifyContent(Justify.SpaceAround)
 			.SetStyleMargin(10, 0, 0, 0)
+			.AddChild(_objectField)
 			.AddChild(buttonSelect)
-			.AddChild(buttonCreate)
-			.AddChild(_objectField);
+			.AddChild(buttonCreate);
 	}
 
 	private void OnSelectButtonClicked()

@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "Unity.Addressables.Editor",
-        "EM.Assistant"
+        "EM.Assistant",
+        "YamlDotNet"
     ],
     "includePlatforms": [
         "Editor"

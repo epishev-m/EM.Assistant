@@ -18,7 +18,7 @@ public abstract class AssistantComponent : VisualElement
 
 	public abstract string Name { get; }
 
-	protected VisualElement Root => _foldout;
+	protected Foldout Root => _foldout;
 
 	public void Show()
 	{

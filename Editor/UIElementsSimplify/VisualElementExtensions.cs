@@ -60,6 +60,15 @@ public static class VisualElementExtensions
 		return control;
 	}
 
+	public static T SetValue<T, TValue>(this T control,
+		TValue value)
+		where T : BaseField<TValue>
+	{
+		control.value = value;
+
+		return control;
+	}
+
 	public static T AddChild<T>(this T visualElement,
 		VisualElement element)
 		where T : VisualElement
