@@ -102,6 +102,21 @@ public static class VisualElementExtensions
 		return visualElement;
 	}
 
+	public static T SetStylePadding<T>(this T visualElement,
+		float bottom,
+		float top,
+		float left,
+		float right)
+		where T : VisualElement
+	{
+		visualElement.style.paddingBottom = new StyleLength(bottom);
+		visualElement.style.paddingTop = new StyleLength(top);
+		visualElement.style.paddingLeft = new StyleLength(left);
+		visualElement.style.paddingRight = new StyleLength(right);
+
+		return visualElement;
+	}
+
 	public static T SetStyleMargin<T>(this T visualElement,
 		float value)
 		where T : VisualElement
