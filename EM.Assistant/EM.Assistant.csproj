@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <PackageId>EM.Assistant</PackageId>
+        <Authors>epishev-m</Authors>
+        <Version>0.0.2</Version>
+        <Title>EM.Assistant</Title>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/epishev-m/EM.Assistant</RepositoryUrl>
+        <RepositoryType>Git</RepositoryType>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Copyright>Copyright (c) 2023 Maxim Epishev (epishev.m@mail.ru)</Copyright>
+        <RootNamespace>EM.Template.Module</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\UPM\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include="..\UPM\Runtime\DocumentationAttribute.cs">
+        <Link>DocumentationAttribute.cs</Link>
+      </Compile>
+    </ItemGroup>
+
+</Project>

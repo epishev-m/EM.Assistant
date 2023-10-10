@@ -1,10 +1,14 @@
 {
   "name": "com.em.assistant",
   "displayName": "EM.Assistant",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Maxim Epishev",
     "email": "epishev.m@mail.ru"
   },
-  "type": "library"
+  "type": "library",
+  "dependencies": {
+    "com.yamldotnet.uni": "13.2.0",
+    "com.unity.addressables": "1.21.18"
+  }
 }
