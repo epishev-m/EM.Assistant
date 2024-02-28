@@ -1,4 +1,7 @@
 # EM.Assistant
+
+Assistant window. Allows to collect in one place custom editors and other functionality intended for automation of routine actions during development
+
 ## Installation
 ### Git
 ```ps1
